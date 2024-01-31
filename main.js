@@ -9,9 +9,10 @@ const txtTotal = document.querySelector("#total");
 // Obtén todas las filas de la tabla
 const filas = document.querySelector(".totalUnitario");
 
-
+var indiceSeleccionado = tipoProducto.selectedIndex;
 let filaTotal;
-let totalUnitario = 0;
+let totalUnitarioE = 0;
+let totalUnitarioG = 0;
 let isv = 0.15;
 let exento = 0;
 let grabado = 0;
@@ -56,12 +57,9 @@ const productoAleatorio = productosExentos[indiceRandomExento];
 //obtiene el valor de la cantidad de productos
 var cantidad = cantidadProductos.value;
 
-
 //obtienes el valor de exento o grabado
-var selectedProduct = tipoProducto.options[tipoProducto.selectedIndex];
-//console.log(selectedProduct);
-
-
+var selectedProductText = tipoProducto.options[indiceSeleccionado].value;
+console.log(selectedProductText);
 
 txtIsv.textContent = 0;
 txtExento.textContent = 0;
@@ -69,54 +67,98 @@ txtGrabado.textContent = 0;
 txtTotal.textContent = 0;
 
 calcularFactura.addEventListener("click", function () {
-  for (let i = 1; i <= cantidad; i++) {
-    productosExentos.forEach((p) => {
-      if (contador < cantidad) {
-        const cantidadRandom =
-          Math.floor(Math.random() * (cantidadMaxima - cantidadMinima + 1)) +
-          cantidadMinima;
+  if (selectedProductText === "exento") {
+    for (let i = 1; i <= cantidad; i++) {
+      productosGrabados.forEach((p) => {
+        if (contador < cantidad) {
+          const cantidadRandom =
+            Math.floor(Math.random() * (cantidadMaxima - cantidadMinima + 1)) +
+            cantidadMinima;
 
-        let fila = document.createElement("tr");
-        let td = document.createElement("td");
+          let fila = document.createElement("tr");
+          let td = document.createElement("td");
 
-        td.innerText = cantidadRandom;
-        fila.appendChild(td);
-       
+          td.innerText = cantidadRandom;
+          fila.appendChild(td);
 
-        td = document.createElement("td");
-        td.innerText = p.nombre;
-        fila.appendChild(td);
-       
+          td = document.createElement("td");
+          td.innerText = p.nombre;
+          fila.appendChild(td);
 
-        td = document.createElement("td");
-        td.innerText = p.precio;
-        totalUnitario += parseFloat(td.innerText = p.precio,2)
-        fila.appendChild(td);
-        
+          td = document.createElement("td");
+          td.innerText = p.precio;
+          //totalUnitarioE += parseFloat((td.innerText = p.precio), 2);
+          fila.appendChild(td);
 
-        td = document.createElement("td");
-        td.innerText = cantidadRandom * parseInt(p.precio);
-        fila.appendChild(td);
+          td = document.createElement("td");
+          td.innerText = cantidadRandom * parseInt(p.precio);
+          totalUnitarioE += parseFloat(
+            (td.innerText = p.precio * cantidadRandom),
+            2
+          );
+          fila.appendChild(td);
 
-        cuerpoTabla.appendChild(fila);
+          cuerpoTabla.appendChild(fila);
 
-        contador++;
-      } else {
-        return;
-      }
-    });
+          contador++;
+        } else {
+          return;
+        }
+      });
+    }
+
+    // Recorre las filas y obtiene el valor de la columna total
+
+    grabado = totalUnitarioE / 1.15;
+    isv = totalUnitarioE - grabado;
+
+    txtTotal.textContent = totalUnitarioE.toFixed(2);
+    txtGrabado.textContent = grabado.toFixed(2);
+    txtIsv.textContent = isv.toFixed(2);
+  } else {
+    for (let i = 1; i <= cantidad; i++) {
+      productosExentos.forEach((p) => {
+        if (contador < cantidad) {
+          const cantidadRandom =
+            Math.floor(Math.random() * (cantidadMaxima - cantidadMinima + 1)) +
+            cantidadMinima;
+
+          let fila = document.createElement("tr");
+          let td = document.createElement("td");
+
+          td.innerText = cantidadRandom;
+          fila.appendChild(td);
+
+          td = document.createElement("td");
+          td.innerText = p.nombre;
+          fila.appendChild(td);
+
+          td = document.createElement("td");
+          td.innerText = p.precio;
+          //totalUnitarioG += parseFloat((td.innerText = p.precio), 2);
+          fila.appendChild(td);
+
+          td = document.createElement("td");
+          td.innerText = cantidadRandom * parseInt(p.precio);
+          totalUnitarioG += parseFloat((td.innerText = p.precio * cantidadRandom),2);
+          fila.appendChild(td);
+
+          cuerpoTabla.appendChild(fila);
+
+          contador++;
+        } else {
+          return;
+        }
+      });
+    }
+
+    isv = totalUnitarioG * 0.15;
+    exento = totalUnitarioG - isv
+
+    txtTotal.textContent = totalUnitarioG.toFixed(2);
+    txtExento.textContent = exento.toFixed(2)
+    txtIsv.textContent = isv.toFixed(2);
   }
-
-  
-  // Recorre las filas y obtiene el valor de la columna total
-
-
-  grabado = totalUnitario / 1.15;
-  isv = totalUnitario - grabado;
-
-  txtTotal.textContent = totalUnitario.toFixed(2);
-  txtGrabado.textContent = grabado.toFixed(2);
-  txtIsv.textContent = isv.toFixed(2);
 });
 
 let cuerpoTabla = document.createElement("tbody");
